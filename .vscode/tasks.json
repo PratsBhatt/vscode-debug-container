@@ -1,0 +1,53 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "docker-build",
+			"label": "docker-build",
+			"platform": "python",
+			"dockerBuild": {
+				"tag": "vscodedebugcontainer:latest",
+				"dockerfile": "${workspaceFolder}\\Dockerfile",
+				"context": "${workspaceFolder}",
+				"pull": true,
+				// Target specifies which stage docker file you would like to have.
+				// In our case we just have production and base.
+				// In practice one might have development, staging and production.
+				"target": "production"
+			}
+		},
+		{
+			"type": "docker-run",
+			"label": "docker-run: debug",
+			"dependsOn": [
+				"docker-build"
+			],
+			"dockerRun": {
+				"volumes": [
+					// This is necessary to map the workspacefolder to the app.
+					{
+						"localPath": "${workspaceFolder}",
+						"containerPath": "/app"
+					}
+				],
+				"ports": [
+					// Exposing the 8000 port as the fastapi server is running on this port.
+					{
+						"containerPort": 8000,
+						"hostPort": 8000
+					}
+				]
+			},
+			"python": {
+				"args": [
+					"src.main:app",
+					"--host",
+					"0.0.0.0",
+					"--port",
+					"8000"
+				],
+				"module": "uvicorn"
+			}
+		}
+	]
+}
