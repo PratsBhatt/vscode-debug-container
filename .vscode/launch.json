@@ -5,6 +5,8 @@
             "type": "docker",
             "request": "launch",
             "preLaunchTask": "docker-run: debug",
+            // a specific container name
+            "containerName": "debug-fastapi",
             "python": {
                 "pathMappings": [
                     {
